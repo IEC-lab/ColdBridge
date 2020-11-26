@@ -24,26 +24,49 @@ function rtspRequestHandle(ws, req) {
         browserBufferTimeout: 1000000
     });
     let url = req.query.url;
-    console.log("rtsp url:", url);
-    console.log("rtsp params:", req.params);
+    console.log("rtsp url: ", url);
+    console.log("rtsp params: ", req.params);
+    var protocol = url.split(":")[0];
     try {
-        ffmpeg(url)
-            .addInputOption("-rtsp_transport", "tcp", "-buffer_size", "102400")  // 这里可以添加一些 RTSP 优化的参数
-            .on("start", function () {
-                console.log(url, "Stream started.");
-            })
-            .on("codecData", function () {
-                console.log(url, "Stream codecData.")
-             // 摄像机在线处理
-            })
-            .on("error", function (err) {
-                console.log(url, "An error occured: ", err.message);
-            })
-            .on("end", function () {
-                console.log(url, "Stream end!");
-             // 摄像机断线的处理
-            })
-            .outputFormat("flv").videoCodec("copy").noAudio().pipe(stream);
+        if(protocol == "rtsp"){
+            ffmpeg(url)
+                .addInputOption("-rtsp_transport", "tcp", "-buffer_size", "102400")  // 这里可以添加一些 RTSP 优化的参数
+                .on("start", function () {
+                    console.log(url, "Stream started.");
+                })
+                .on("codecData", function () {
+                    console.log(url, "Stream codecData.")
+                // 摄像机在线处理
+                })
+                .on("error", function (err) {
+                    console.log(url, "An error occured: ", err.message);
+                })
+                .on("end", function () {
+                    console.log(url, "Stream end!");
+                // 摄像机断线的处理
+                })
+                .outputFormat("flv").videoCodec("copy").noAudio().pipe(stream);
+        }else if(protocol == "rtmp"){
+            ffmpeg(url)
+                //.addInputOption("-rtsp_transport", "tcp", "-buffer_size", "102400")  // 这里可以添加一些 RTSP 优化的参数
+                .on("start", function () {
+                    console.log(url, "Stream started.");
+                })
+                .on("codecData", function () {
+                    console.log(url, "Stream codecData.")
+                // 摄像机在线处理
+                })
+                .on("error", function (err) {
+                    console.log(url, "An error occured: ", err.message);
+                })
+                .on("end", function () {
+                    console.log(url, "Stream end!");
+                // 摄像机断线的处理
+                })
+                .outputFormat("flv").videoCodec("copy").noAudio().pipe(stream);
+        }else{
+            console.log("not rtsp or rtmp");
+        }
     } catch (error) {
         console.log(error);
     }
